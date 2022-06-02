@@ -15,3 +15,11 @@ ureq = {version = "2.4.0", features = ["brotli"]}
 rpassword = "6.0.1"
 sha1 = "0.10.1"
 colored = "2.*"
+num-format = "0.4.0"
+rayon = "1.5.3"
+indicatif = "0.16.2"
+crossbeam-channel = "0.5.4"
+
+[profile.release]
+overflow-checks = true
+lto = "thin"
