@@ -1,6 +1,6 @@
 # haveibeenpwned
 
-haveibeenpwned is a command-line application that uses [have i been pwned?](https://haveibeenpwned.com/) service. This is still WIP.
+haveibeenpwned is a command-line application that uses [have i been pwned?](https://haveibeenpwned.com/) service and can create and use Binary Fuse filter for efficient query at cost of false positives. This is still WIP.
 
 # Roadmap
 [x] Interactively check compromised password using HIBP API (requires internet)
