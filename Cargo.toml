@@ -1,6 +1,6 @@
 [package]
 name = "haveibeenpwned"
-version = "0.1.0"
+version = "0.1.0-alpha"
 edition = "2021"
 license = "AGPL-3.0-only"
 authors = ["CKingX"]
