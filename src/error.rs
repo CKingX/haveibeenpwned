@@ -16,11 +16,8 @@ pub fn server_error() {
 }
 
 pub fn download_output_error(error: std::io::Error) {
-    let error_message = format!("{}", error.kind().to_string());
-    let message = format!(
-        "{}",
-        DOWNLOAD_OUTPUT_FILE_ERROR.replace("{error}", &error_message)
-    );
+    let error_message = error.kind();
+    let message = DOWNLOAD_OUTPUT_FILE_ERROR.replace("{error}", &error_message.to_string());
     print_error(message);
 }
 

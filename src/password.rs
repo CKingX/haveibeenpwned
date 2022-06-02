@@ -81,7 +81,7 @@ pub fn download_range(range: u64) -> Result<String, ServerError> {
         .map(|n| format!("{range}{n}"))
         .fold("".to_string(), |mut a, b| {
             a.push_str(&b);
-            a.push_str("\n");
+            a.push('\n');
             a
         });
 
