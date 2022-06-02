@@ -1,11 +1,11 @@
 #![allow(unused_variables)]
 mod arguments;
+mod downloader;
 mod error;
 mod interactive_online;
+mod password;
 
 use arguments::*;
-
-// const HIBP_TOTAL: usize = 16usize.pow(5);
 
 fn main() {
     let args = handle_arguments();
@@ -16,7 +16,7 @@ fn main() {
             file,
         } => todo!(),
         Commands::InteractiveOnline => interactive_online::interactive(),
-        Commands::Downloader { output } => todo!(),
+        Commands::Downloader { output } => downloader::downloader(output),
         Commands::FileCheck {
             password_type,
             password_file,
