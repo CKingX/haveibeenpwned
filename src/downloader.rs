@@ -14,10 +14,11 @@ const HIBP_TOTAL: u64 = 16u64.pow(5);
 enum Message {
     Progress,
     Done,
+    Error(u64),
 }
 
 pub fn downloader(output: OsString) {
-    let (sender, receiver) = bounded::<Message>(50);
+    let (sender, receiver) = bounded::<Message>(128);
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
     let mut progress = 0;
@@ -40,7 +41,7 @@ pub fn downloader(output: OsString) {
         if let Ok(file) = file {
             let file = Arc::new(Mutex::new(std::io::BufWriter::new(file)));
 
-            (0..=HIBP_TOTAL).into_par_iter().for_each(|n| {
+            _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
                 let sender = Arc::clone(&sender);
                 let file = Arc::clone(&file);
                 let result = password::download_range(n);
@@ -50,9 +51,15 @@ pub fn downloader(output: OsString) {
                         let data_to_write = range.as_bytes();
                         let write_output = file.write(data_to_write);
                     }
-                    Err(_) => error::download_error(),
+                    Err(_) => {
+                        sender.send(Message::Error(n)).unwrap();
+                        return Err(n);
+                    }
                 }
-                sender.send(Message::Progress).unwrap();
+                match sender.send(Message::Progress) {
+                    Ok(_) => Ok(()),
+                    Err(_) => Err(n),
+                }
             });
             let mut file = file.lock().unwrap();
             if let Err(error) = file.flush() {
@@ -76,6 +83,11 @@ pub fn downloader(output: OsString) {
                     progress_bar.finish_with_message("downloaded");
                     break;
                 },
+                Message::Error(n) => {
+                    progress_bar.abandon_with_message("⚠️");
+                    error::download_error(n);
+                    break;
+                }
             }
         }
     }

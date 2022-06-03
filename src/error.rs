@@ -4,7 +4,7 @@ use colored::Colorize;
 
 const SERVER_ERROR: &str = "Server error";
 const DOWNLOAD_OUTPUT_FILE_ERROR: &str = "Unable to output downloaded file: {error}";
-const DOWNLOAD_ERROR: &str = "Unable to download password ranges";
+const DOWNLOAD_ERROR: &str = "Unable to download password range: ";
 
 fn print_error(error: impl Display) {
     let error_string = format!("{error}");
@@ -21,6 +21,6 @@ pub fn download_output_error(error: std::io::Error) {
     print_error(message);
 }
 
-pub fn download_error() {
-    print_error(DOWNLOAD_ERROR);
+pub fn download_error(range: u64) {
+    print_error(format!("{DOWNLOAD_ERROR}{:05X}", range));
 }
