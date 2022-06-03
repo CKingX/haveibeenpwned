@@ -2,9 +2,9 @@
 mod arguments;
 mod downloader;
 mod error;
+mod filter_generator;
 mod interactive_online;
 mod password;
-mod filter_generator;
 
 use arguments::*;
 
@@ -24,6 +24,8 @@ fn main() {
             file,
             print_passwords,
         } => todo!(),
-        Commands::CreateFilter { input, output } => filter_generator::generate_filter(input, output),
+        Commands::CreateFilter { input, output } => {
+            filter_generator::generate_filter(input, output)
+        }
     };
 }
