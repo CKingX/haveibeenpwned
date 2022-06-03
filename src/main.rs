@@ -1,4 +1,3 @@
-#![allow(unused_variables)]
 mod arguments;
 mod downloader;
 mod error;

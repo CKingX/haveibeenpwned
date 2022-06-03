@@ -49,7 +49,12 @@ pub fn downloader(output: OsString) {
                     Ok(range) => {
                         let mut file = file.lock().unwrap();
                         let data_to_write = range.as_bytes();
-                        let write_output = file.write(data_to_write);
+                        let write_output = file.write_all(data_to_write);
+                        if let Err(error) = write_output {
+                            eprintln!("Unable to write to output file: {}", error.kind());
+                            sender.send(Message::Error(n)).unwrap();
+                            return Err(n);
+                        }
                     }
                     Err(_) => {
                         sender.send(Message::Error(n)).unwrap();
