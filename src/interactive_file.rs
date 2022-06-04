@@ -20,6 +20,7 @@ pub fn interactive_file(file: OsString) {
     drop(input_file);
 
     let filter: Result<filter::Filter, _> = rmp_serde::from_slice(&mp_file);
+    drop(mp_file);
     if filter.is_err() {
         eprintln!("Input file is not a valid filter");
         return;
