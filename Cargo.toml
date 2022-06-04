@@ -8,7 +8,8 @@ keywords = ["haveibeenpwned", "password", "hibp"]
 readme = "README.md"
 homepage = "https://github.com/CKingX/haveibeenpwned"
 repository = "https://github.com/CKingX/haveibeenpwned"
-description = "haveibeenpwned is a command-line application that uses have i been pwned? service and can create and use Binary Fuse filter for efficient query at cost of false positives."
+description = "haveibeenpwned is a command-line application that uses HaveIBeenPwned service and can create and use Binary Fuse filter for efficient query at cost of false positives."
+categories = ["command-line-utilities"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
