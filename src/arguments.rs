@@ -10,11 +10,8 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Check if password is compromised using either a filter created by HIBP or  downloaded passwords file
+    /// Check if password is compromised using a filter
     InteractiveFile {
-        #[clap(arg_enum)]
-        /// Choose a password file type
-        password_type: FileType,
         /// Location of password file
         file: OsString,
     },
@@ -27,8 +24,6 @@ pub enum Commands {
     },
     /// Check all passwords in a file to see if they are compromised
     FileCheck {
-        #[clap(arg_enum)]
-        password_type: FileType,
         password_file: OsString,
         file: OsString,
         #[clap(short, long)]
@@ -42,14 +37,6 @@ pub enum Commands {
         /// Output location of the filter
         output: OsString,
     },
-}
-
-#[derive(clap::ArgEnum, Clone)]
-pub enum FileType {
-    /// Downloaded HIBP file
-    DownloadedPasswords,
-    /// Filter created by hibp
-    Filter,
 }
 
 pub fn handle_arguments() -> Cli {

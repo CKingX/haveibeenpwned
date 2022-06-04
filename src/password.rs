@@ -24,7 +24,7 @@ impl From<std::io::Error> for ServerError {
     }
 }
 
-fn hash(password: String) -> String {
+fn hash(password: &str) -> String {
     let mut hash = Sha1::new();
     hash.update(password);
 
@@ -40,7 +40,7 @@ fn hash(password: String) -> String {
 }
 
 pub fn check_password_online(password: String) -> Result<PasswordWithUsage, ()> {
-    let result = hash(password);
+    let result = hash(&password);
 
     let request = ureq::get(&format!(
         "https://api.pwnedpasswords.com/range/{}",
@@ -88,6 +88,10 @@ pub fn download_range(range: u64) -> Result<String, ServerError> {
     Ok(request)
 }
 
-fn strip_padding(n: &&str) -> bool {
-    !n.ends_with(":0")
+pub fn strip_padding(line: &&str) -> bool {
+    !line.ends_with(":0")
+}
+
+pub fn remove_usage(line: &str) -> String {
+    line.split(':').next().unwrap().to_string()
 }

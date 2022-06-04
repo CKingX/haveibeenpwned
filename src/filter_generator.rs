@@ -1,14 +1,18 @@
-use std::{ffi::OsString, fmt::Display};
+use crate::filter::{FilterSize, self};
+use crate::password;
+use siphasher::sip::SipHasher13;
+use std::hash::Hash;
+use std::io::Write;
+use std::{
+    ffi::OsString,
+    fmt::Display,
+    hash::Hasher,
+    io::{BufRead, BufReader},
+};
 
 enum Size {
     GB(f64),
     MB(f64),
-}
-
-enum FilterSize {
-    Small,
-    Medium,
-    Large,
 }
 
 impl Display for Size {
@@ -64,5 +68,53 @@ pub fn generate_filter(input: OsString, output: OsString) {
         }
     }
 
-    todo!();
+    let input_file = std::fs::File::options().read(true).open(input);
+    let output_file = std::fs::File::options().write(true).create_new(true).open(output);
+    let keys = SipHasher13::new().keys();
+
+    if let Err(error) = input_file {
+        eprintln!("Unable to read input file: {}", error.kind());
+        return;
+    }
+
+    if let Err(error) = output_file {
+        eprintln!("Unable to write to input file: {}", error.kind());
+        return;
+    }
+    let mut output_file = output_file.unwrap();
+
+    let input_file = BufReader::new(input_file.unwrap())
+        .lines()
+        .map(|n| n.unwrap())
+        .map(|n| password::remove_usage(&n))
+        .map(|n| {
+            let mut hasher = SipHasher13::new_with_keys(keys.0, keys.1);
+            n.hash(&mut hasher);
+            hasher.finish()
+        })
+        .collect::<Vec<_>>();
+
+    let filter = filter::Filter::new(&input_file, keys, result);
+    if let Err(()) = filter {
+        eprintln!("Unable to generate filter. Please report this issue with diagnostics codes {} {}", keys.0, keys.1);
+        return;
+    }
+    let filter = filter.unwrap();
+
+    drop(input_file);
+
+    let output = rmp_serde::to_vec(&filter);
+    
+    if let Err(_) = output {
+        eprintln!("Unable to convert filter for output");
+        return;
+    }
+    let output = output.unwrap();
+
+    if let Err(error) = output_file.write_all(&output) {
+        eprintln!("Unable to write to output file: {}", error.kind());
+        return;
+    }
+
+    println!("Filter created with {} items", filter.len());
 }
