@@ -32,11 +32,17 @@ pub fn hash(password: &str) -> String {
 
     let result = result.as_slice();
 
-    let mut array = [0; 16];
+    let mut array = [0; 20];
 
-    array[..16].copy_from_slice(&result[..16]);
+    array[..20].copy_from_slice(&result[..20]);
 
-    format!("{:X}", u128::from_be_bytes(array))
+    let mut password = String::new();
+
+    for items in array {
+        password.push_str(&format!("{:02X}", items));
+    }
+
+    password
 }
 
 pub fn check_password_online(password: String) -> Result<PasswordWithUsage, ()> {
