@@ -24,7 +24,7 @@ impl From<std::io::Error> for ServerError {
     }
 }
 
-fn hash(password: &str) -> String {
+pub fn hash(password: &str) -> String {
     let mut hash = Sha1::new();
     hash.update(password);
 

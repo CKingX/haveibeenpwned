@@ -12,7 +12,7 @@ pub fn interactive() {
             PasswordWithUsage::SafePassword => println!("Password not compromised"),
             PasswordWithUsage::CompromisedPassword(num) => {
                 println!(
-                    "The password is compromised. It has been seen {} times",
+                    "Password is compromised. It has been seen {} times",
                     num.to_formatted_string(&Locale::en)
                 )
             }

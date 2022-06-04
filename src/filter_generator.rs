@@ -57,7 +57,7 @@ pub fn generate_filter(input: OsString, output: OsString) {
                     "s" => FilterSize::Small,
                     "m" => FilterSize::Medium,
                     "l" => FilterSize::Large,
-                    other => {
+                    _ => {
                         println!("Wrong option. Try again:");
                         continue;
                     }
@@ -90,12 +90,18 @@ pub fn generate_filter(input: OsString, output: OsString) {
         .lines()
         .map(|n| n.unwrap())
         .map(|n| password::remove_usage(&n))
+        .map(|mut n| {
+            n.make_ascii_uppercase();
+            n
+        })
         .map(|n| {
             let mut hasher = SipHasher13::new_with_keys(keys.0, keys.1);
             n.hash(&mut hasher);
             hasher.finish()
         })
         .collect::<Vec<_>>();
+
+    println!("Generating filter...");
 
     let filter = filter::Filter::new(&input_file, keys, result);
     if let Err(()) = filter {
@@ -109,9 +115,11 @@ pub fn generate_filter(input: OsString, output: OsString) {
 
     drop(input_file);
 
+    println!("Filter generated. Preparing filter for output...");
+
     let output = rmp_serde::to_vec(&filter);
 
-    if let Err(_) = output {
+    if output.is_err() {
         eprintln!("Unable to convert filter for output");
         return;
     }

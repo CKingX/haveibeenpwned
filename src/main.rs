@@ -13,7 +13,7 @@ fn main() {
     let args = handle_arguments();
 
     match args.command {
-        Commands::InteractiveFile { file } => todo!(),
+        Commands::InteractiveFile { file } => interactive_file::interactive_file(file),
         Commands::InteractiveOnline => interactive_online::interactive(),
         Commands::Downloader { output } => downloader::downloader(output),
         Commands::FileCheck {
