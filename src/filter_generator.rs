@@ -81,7 +81,7 @@ pub fn generate_filter(input: OsString, output: OsString) {
     }
 
     if let Err(error) = output_file {
-        eprintln!("Unable to write to input file: {}", error.kind());
+        eprintln!("Unable to write to output file: {}", error.kind());
         return;
     }
     let mut output_file = output_file.unwrap();
