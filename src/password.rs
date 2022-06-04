@@ -95,3 +95,15 @@ pub fn strip_padding(line: &&str) -> bool {
 pub fn remove_usage(line: &str) -> String {
     line.split(':').next().unwrap().to_string()
 }
+
+pub fn get_password() -> String {
+    let password = loop {
+        let password = rpassword::prompt_password("Password to check: ");
+        if password.is_err() || password.as_ref().unwrap().is_empty() {
+            println!("No password given. Try again");
+            continue;
+        }
+        break password.unwrap();
+    };
+    password
+}

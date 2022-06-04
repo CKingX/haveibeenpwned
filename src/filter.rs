@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use xorf::{BinaryFuse16, BinaryFuse32, BinaryFuse8, Filter as FuseFilter};
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub enum FilterSize {
     Small,
     Medium,

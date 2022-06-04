@@ -1,4 +1,4 @@
-use crate::filter::{FilterSize, self};
+use crate::filter::{self, FilterSize};
 use crate::password;
 use siphasher::sip::SipHasher13;
 use std::hash::Hash;
@@ -69,7 +69,10 @@ pub fn generate_filter(input: OsString, output: OsString) {
     }
 
     let input_file = std::fs::File::options().read(true).open(input);
-    let output_file = std::fs::File::options().write(true).create_new(true).open(output);
+    let output_file = std::fs::File::options()
+        .write(true)
+        .create_new(true)
+        .open(output);
     let keys = SipHasher13::new().keys();
 
     if let Err(error) = input_file {
@@ -96,7 +99,10 @@ pub fn generate_filter(input: OsString, output: OsString) {
 
     let filter = filter::Filter::new(&input_file, keys, result);
     if let Err(()) = filter {
-        eprintln!("Unable to generate filter. Please report this issue with diagnostics codes {} {}", keys.0, keys.1);
+        eprintln!(
+            "Unable to generate filter. Please report this issue with diagnostics codes {} {}",
+            keys.0, keys.1
+        );
         return;
     }
     let filter = filter.unwrap();
@@ -104,7 +110,7 @@ pub fn generate_filter(input: OsString, output: OsString) {
     drop(input_file);
 
     let output = rmp_serde::to_vec(&filter);
-    
+
     if let Err(_) = output {
         eprintln!("Unable to convert filter for output");
         return;

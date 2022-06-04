@@ -3,6 +3,7 @@ mod downloader;
 mod error;
 mod filter;
 mod filter_generator;
+mod interactive_file;
 mod interactive_online;
 mod password;
 
