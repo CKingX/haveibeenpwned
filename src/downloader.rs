@@ -40,11 +40,12 @@ pub fn downloader(output: OsString) {
 
         if let Ok(file) = file {
             let file = Arc::new(Mutex::new(std::io::BufWriter::new(file)));
+            let agent = ureq::agent();
 
             _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
                 let sender = Arc::clone(&sender);
                 let file = Arc::clone(&file);
-                let result = password::download_range(n);
+                let result = password::download_range(&agent, n);
                 match result {
                     Ok(range) => {
                         let mut file = file.lock().unwrap();

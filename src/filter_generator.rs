@@ -1,5 +1,6 @@
 use crate::filter::{self, FilterSize};
 use crate::password;
+use serde::Serialize;
 use siphasher::sip::SipHasher13;
 use std::hash::Hash;
 use std::io::Write;
@@ -117,15 +118,16 @@ pub fn generate_filter(input: OsString, output: OsString) {
 
     println!("Filter generated. Preparing filter for output...");
 
-    let output = rmp_serde::to_vec(&filter);
+    let mut output = flexbuffers::FlexbufferSerializer::new();
+    let serialize_result = filter.serialize(&mut output);
 
-    if output.is_err() {
+    if serialize_result.is_err() {
         eprintln!("Unable to convert filter for output");
         return;
     }
-    let output = output.unwrap();
+    let output = output.view();
 
-    if let Err(error) = output_file.write_all(&output) {
+    if let Err(error) = output_file.write_all(output) {
         eprintln!("Unable to write to output file: {}", error.kind());
         return;
     }

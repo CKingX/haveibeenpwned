@@ -76,9 +76,10 @@ pub fn check_password_online(password: String) -> Result<PasswordWithUsage, ()> 
     }
 }
 
-pub fn download_range(range: u64) -> Result<String, ServerError> {
+pub fn download_range(agent: &ureq::Agent, range: u64) -> Result<String, ServerError> {
     let range = format!("{:05X}", range);
-    let request = ureq::get(&format!("https://api.pwnedpasswords.com/range/{range}"))
+    let request = agent
+        .get(&format!("https://api.pwnedpasswords.com/range/{range}"))
         .set("Add-Padding", "true")
         .call()?
         .into_string()?
