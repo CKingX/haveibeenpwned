@@ -1,6 +1,4 @@
-use serde::Deserialize;
-
-use crate::filter::Filter;
+use crate::filter;
 use crate::password;
 use std::{ffi::OsString, io::Read};
 
@@ -21,18 +19,8 @@ pub fn interactive_file(file: OsString) {
 
     drop(input_file);
 
-    let filter = flexbuffers::Reader::get_root(&*mp_file);
-
-    if filter.is_err() {
-        eprintln!("Input file is not a valid filter");
-        return;
-    }
-
-    let filter = filter.unwrap();
-
-    let filter = Filter::deserialize(filter);
+    let filter: Result<filter::Filter, _> = rmp_serde::from_slice(&mp_file);
     drop(mp_file);
-
     if filter.is_err() {
         eprintln!("Input file is not a valid filter");
         return;

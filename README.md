@@ -10,4 +10,4 @@ haveibeenpwned is a command-line application that uses [HaveIBeenPwned](https://
 - [ ] Check list of passwords in a file (using a filter) to see how many are compromised
 
 ## Compatibility
-As haveibeenpwned is still in alpha, the design of the filter is not final.  Therefore, filter file compatibility will **not** be maintained between versions until haveibeenpwned is no longer an alpha version. Filter created by version 0.4.0-alpha is not compatible with 0.5.0-alpha (for example).
+As haveibeenpwned is still in alpha, the design of the filter is not final.  Therefore, filter file compatibility will **not** be maintained between versions until haveibeenpwned is no longer an alpha version.
