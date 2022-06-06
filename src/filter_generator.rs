@@ -2,7 +2,7 @@ use crate::filter::{self, FilterSize};
 use crate::password;
 use siphasher::sip::SipHasher13;
 use std::hash::Hash;
-use std::io::Write;
+use std::io::BufWriter;
 use std::{
     ffi::OsString,
     fmt::Display,
@@ -84,7 +84,7 @@ pub fn generate_filter(input: OsString, output: OsString) {
         eprintln!("Unable to write to output file: {}", error.kind());
         return;
     }
-    let mut output_file = output_file.unwrap();
+    let output_file = BufWriter::new(output_file.unwrap());
 
     let input_file = BufReader::new(input_file.unwrap())
         .lines()
@@ -117,16 +117,10 @@ pub fn generate_filter(input: OsString, output: OsString) {
 
     println!("Filter generated. Preparing filter for output...");
 
-    let output = rmp_serde::to_vec(&filter);
+    let output = bincode::serialize_into(output_file, &filter);
 
-    if output.is_err() {
-        eprintln!("Unable to convert filter for output");
-        return;
-    }
-    let output = output.unwrap();
-
-    if let Err(error) = output_file.write_all(&output) {
-        eprintln!("Unable to write to output file: {}", error.kind());
+    if let Err(error) = output {
+        eprintln!("Unable to write to output file: {}", error);
         return;
     }
 

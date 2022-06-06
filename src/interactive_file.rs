@@ -1,6 +1,7 @@
 use crate::filter;
 use crate::password;
-use std::{ffi::OsString, io::Read};
+use std::ffi::OsString;
+use std::io::BufReader;
 
 pub fn interactive_file(file: OsString) {
     let input_file = std::fs::File::options().read(true).open(file);
@@ -9,18 +10,10 @@ pub fn interactive_file(file: OsString) {
         return;
     }
 
-    let mut mp_file = Vec::new();
-    let input_file = input_file.unwrap().read_to_end(&mut mp_file);
+    let input_file = BufReader::new(input_file.unwrap());
 
-    if let Err(error) = input_file {
-        eprintln!("Unable to read the input file: {}", error.kind());
-        return;
-    }
+    let filter: Result<filter::Filter, _> = bincode::deserialize_from(input_file);
 
-    drop(input_file);
-
-    let filter: Result<filter::Filter, _> = rmp_serde::from_slice(&mp_file);
-    drop(mp_file);
     if filter.is_err() {
         eprintln!("Input file is not a valid filter");
         return;

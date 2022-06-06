@@ -23,10 +23,19 @@ pub fn downloader(output: OsString) {
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
     let mut progress = 0;
 
+    if rayon::ThreadPoolBuilder::new()
+        .num_threads(6)
+        .build_global()
+        .is_err()
+    {
+        eprintln!("Could not configure parallel downloading");
+        return;
+    }
+
     progress_bar.set_style(
         ProgressStyle::template(
             ProgressStyle::default_bar(),
-            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>7}/{lens:7} ({eta})",
+            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos:>7}/{len:7} ({eta})",
         )
         .progress_chars("#>-"),
     );
@@ -43,8 +52,6 @@ pub fn downloader(output: OsString) {
             let agent = ureq::agent();
 
             _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
-                let sender = Arc::clone(&sender);
-                let file = Arc::clone(&file);
                 let result = password::download_range(&agent, n);
                 match result {
                     Ok(range) => {
