@@ -12,7 +12,7 @@ use std::sync::RwLock;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
-const HIBP_TOTAL: u64 = 16u64.pow(5);
+const HIBP_TOTAL: u64 = 16u64.pow(5) - 1;
 
 #[derive(Copy, Clone)]
 enum Message {
