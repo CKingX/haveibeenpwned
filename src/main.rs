@@ -1,4 +1,5 @@
 mod arguments;
+mod config;
 mod downloader;
 mod error;
 mod filter;

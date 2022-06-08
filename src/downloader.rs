@@ -1,10 +1,14 @@
+use crate::config::Config;
+use crate::config::Resume;
 use crate::error;
 use crate::password;
+use bitvec::bitbox;
 use crossbeam_channel::{bounded, select};
 use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::ffi::OsString;
 use std::io::Write;
+use std::sync::RwLock;
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -22,6 +26,7 @@ pub fn downloader(output: OsString) {
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
     let mut progress = 0;
+    let output_file = output.clone();
 
     if rayon::ThreadPoolBuilder::new()
         .num_threads(6)
@@ -40,18 +45,39 @@ pub fn downloader(output: OsString) {
         .progress_chars("#>-"),
     );
 
+    let config = Config::load();
+    let resume_file = if let Some(resume) = config.resume_token {
+        if resume.download_file == output_file {
+            Arc::new(RwLock::new(resume.resume))
+        } else {
+            Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
+        }
+    } else {
+        Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
+    };
+
+    let resume = Arc::clone(&resume_file);
+
     let thread = thread::spawn(move || {
         let file = std::fs::File::options()
             .write(true)
             .create(true)
             .truncate(true)
-            .open(output);
+            .open(output_file);
 
         if let Ok(file) = file {
-            let file = Arc::new(Mutex::new(std::io::BufWriter::new(file)));
+            let file = Mutex::new(std::io::BufWriter::new(file));
             let agent = ureq::agent();
+            let resume = Arc::clone(&resume);
 
             _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
+                {
+                    let status = resume.read().unwrap();
+                    if *status.get(n as usize).unwrap() {
+                        sender.send(Message::Progress).unwrap();
+                        return Ok(());
+                    }
+                }
                 let result = password::download_range(&agent, n);
                 match result {
                     Ok(range) => {
@@ -69,6 +95,9 @@ pub fn downloader(output: OsString) {
                         return Err(n);
                     }
                 }
+                let mut token = resume.write().unwrap();
+                token.get_mut(n as usize).unwrap().set(true);
+                drop(token);
                 match sender.send(Message::Progress) {
                     Ok(_) => Ok(()),
                     Err(_) => Err(n),
@@ -94,10 +123,19 @@ pub fn downloader(output: OsString) {
                 },
                 Message::Done => {
                     progress_bar.finish_with_message("downloaded");
+                    let mut config = Config::load();
+                    config.resume_token = None;
+                    config.store();
                     break;
                 },
                 Message::Error(n) => {
                     progress_bar.abandon_with_message("⚠️");
+                    let mut config = Config::load();
+                    config.resume_token = Some(Resume {
+                        resume: resume_file.read().unwrap().clone(),
+                        download_file: output,
+                    });
+                    config.store();
                     error::download_error(n);
                     break;
                 }

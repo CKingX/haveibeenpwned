@@ -81,7 +81,14 @@ pub fn download_range(agent: &ureq::Agent, range: u64) -> Result<String, ServerE
     let request = agent
         .get(&format!("https://api.pwnedpasswords.com/range/{range}"))
         .set("Add-Padding", "true")
-        .call()?
+        .call();
+
+    if let Err(error) = request {
+        _ = dbg!(error);
+        return Err(ServerError);
+    }
+    let request = request
+        .unwrap()
         .into_string()?
         .lines()
         .filter(strip_padding)
