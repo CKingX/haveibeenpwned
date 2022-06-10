@@ -1,5 +1,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FCKingX%2Fhaveibeenpwned.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FCKingX%2Fhaveibeenpwned?ref=badge_shield)
 
+![https://img.shields.io/crates/v/haveibeenpwned](https://crates.io/crates/haveibeenpwned)
+
 # haveibeenpwned
 
 haveibeenpwned is a command-line application that uses [HaveIBeenPwned](https://haveibeenpwned.com/) service and can create and use Binary Fuse filter (which is smaller than Bloom filter or Cuckoo filter for the same false positive ratio) for efficient query at cost of false positives.
