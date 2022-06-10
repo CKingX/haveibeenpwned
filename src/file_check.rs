@@ -1,6 +1,5 @@
 use rayon::iter::ParallelIterator;
 use std::sync::atomic::{AtomicI32, Ordering};
-use std::time::{Duration, SystemTime};
 use std::{ffi::OsString, io::BufRead};
 
 use rayon::iter::ParallelBridge;
