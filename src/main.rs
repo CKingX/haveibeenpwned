@@ -2,12 +2,12 @@ mod arguments;
 mod config;
 mod downloader;
 mod error;
+mod file_check;
 mod filter;
 mod filter_generator;
 mod interactive_file;
 mod interactive_online;
 mod password;
-mod file_check;
 
 use arguments::*;
 

@@ -1,7 +1,7 @@
-use std::sync::atomic::{AtomicI32, Ordering};
-use std::time::{SystemTime, Duration};
-use std::{ffi::OsString, io::BufRead};
 use rayon::iter::ParallelIterator;
+use std::sync::atomic::{AtomicI32, Ordering};
+use std::time::{Duration, SystemTime};
+use std::{ffi::OsString, io::BufRead};
 
 use rayon::iter::ParallelBridge;
 
@@ -13,12 +13,12 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
     let filter = if let Some(filter) = Filter::open_filter(filter) {
         filter
     } else {
-        return
+        return;
     };
     println!("Filter loaded");
 
     let file = std::fs::File::options().read(true).open(&password_file);
-    
+
     if let Err(error) = file {
         eprintln!("Unable to open password file: {}", error.kind());
         return;
@@ -33,7 +33,7 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
     let before = SystemTime::now();
 
     let result = file.lines().par_bridge().try_for_each(|password| {
-        if let Err(_) = password {
+        if password.is_err() {
             eprintln!("unable to read password from password file");
             return Err(());
         }
@@ -47,25 +47,30 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
             }
         }
 
-        return Ok(());
+        Ok(())
     });
 
-    if let Err(_) = result {return;}
+    if result.is_err() {
+        return;
+    }
 
     let after = SystemTime::now().duration_since(before);
 
     match after {
-        Ok(time) => {let time =
-                if time < Duration::from_millis(1) {
-                    format!("{} µs", time.as_micros())
-                } else {
-                    format!("{} ms", time.as_millis())
-                };
-        println!("Password checking took {time}");
+        Ok(time) => {
+            let time = if time < Duration::from_millis(1) {
+                format!("{} µs", time.as_micros())
+            } else {
+                format!("{} ms", time.as_millis())
+            };
+            println!("Password checking took {time}");
         }
         Err(_) => println!("Unable to determine time"),
     }
 
-    println!("Out of {}, there were {} compromised passwords", total_count.load(Ordering::Relaxed), compromised_count.load(Ordering::Relaxed));
-    
+    println!(
+        "Out of {}, there were {} compromised passwords",
+        total_count.load(Ordering::Relaxed),
+        compromised_count.load(Ordering::Relaxed)
+    );
 }
