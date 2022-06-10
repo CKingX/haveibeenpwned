@@ -2,7 +2,7 @@
 
 # haveibeenpwned
 
-haveibeenpwned is a command-line application that uses [HaveIBeenPwned](https://haveibeenpwned.com/) service and can create and use Binary Fuse filter (which is smaller than Bloom filter or Cuckoo filter for the same false positive ratio) for efficient query at cost of false positives. This is still WIP.
+haveibeenpwned is a command-line application that uses [HaveIBeenPwned](https://haveibeenpwned.com/) service and can create and use Binary Fuse filter (which is smaller than Bloom filter or Cuckoo filter for the same false positive ratio) for efficient query at cost of false positives.
 
 ## Features
 - Interactively check compromised password using HIBP API (requires internet) with `haveibeenpwed interactive-online`
