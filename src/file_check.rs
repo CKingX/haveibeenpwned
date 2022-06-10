@@ -30,8 +30,6 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
     let total_count = AtomicI32::new(0);
     let compromised_count = AtomicI32::new(0);
 
-    let before = SystemTime::now();
-
     let result = file.lines().par_bridge().try_for_each(|password| {
         if password.is_err() {
             eprintln!("unable to read password from password file");
@@ -52,20 +50,6 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
 
     if result.is_err() {
         return;
-    }
-
-    let after = SystemTime::now().duration_since(before);
-
-    match after {
-        Ok(time) => {
-            let time = if time < Duration::from_millis(1) {
-                format!("{} µs", time.as_micros())
-            } else {
-                format!("{} ms", time.as_millis())
-            };
-            println!("Password checking took {time}");
-        }
-        Err(_) => println!("Unable to determine time"),
     }
 
     println!(
