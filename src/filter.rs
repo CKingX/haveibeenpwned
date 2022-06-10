@@ -1,8 +1,12 @@
-use std::hash::{Hash, Hasher};
+use std::{
+    hash::{Hash, Hasher},
+    io::BufReader,
+};
 
 use crate::password::{self, Password};
 use serde::{Deserialize, Serialize};
 use siphasher::sip::SipHasher13;
+use std::ffi::OsString;
 use xorf::{BinaryFuse16, BinaryFuse32, BinaryFuse8, Filter as FuseFilter};
 
 #[derive(Copy, Clone)]
@@ -72,5 +76,24 @@ impl Filter {
             true => Password::CompromisedPassword,
             false => Password::SafePassword,
         }
+    }
+
+    pub fn open_filter(file: OsString) -> Option<Self> {
+        let input_file = std::fs::File::options().read(true).open(file);
+        if let Err(error) = input_file {
+            eprintln!("Unable to open the input file: {}", error.kind());
+            return None;
+        }
+
+        let input_file = BufReader::new(input_file.unwrap());
+
+        let filter: Result<Self, _> = bincode::deserialize_from(input_file);
+
+        if filter.is_err() {
+            eprintln!("Input file is not a valid filter");
+            return None;
+        }
+
+        Some(filter.unwrap())
     }
 }
