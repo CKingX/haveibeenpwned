@@ -16,7 +16,7 @@ haveibeenpwned is a command-line application that uses [HaveIBeenPwned](https://
 Prebuilt filters are available ([small](https://mega.nz/file/l5JwgTgR#fUtrkSzuItzO_ED_WWxAJOfvld9TnuHrDhEwW2ToMcg), [medium](https://mega.nz/file/wgYUiQwQ#JJLJ-QPLdJ0YCRXulLPjq0tVQG69kMQ8IkEIjdZYllk), [large](https://mega.nz/file/ApZVXRxL#PUSdijeY1wyQdyBHLqWtZ2yB0PfnNZLwTX-VhTew9HU)). The Small filter has a size of 909 MiB (with false positivity rate of ~0.4%). The Medium filter has a size of 1.77 GiB (with false positivity rate of 0.0016%) and the Large filter has a size of 3.55 GiB (with false positivity rate of <1 in 4 billion).
 
 ## Compatibility
-As haveibeenpwned was in alpha, the design of the filter wasis not final at the time. Therefore, filter file compatibility was not maintained between versions until now. Filter created by version 0.4.0-alpha is not compatible with 0.5.0 (and version 0.5.0 has smaller filters than version 0.4.0). However, compatibility from v0.5.0 onwards (current version) will be maintained.
+As haveibeenpwned was in alpha, the design of the filter was not final at the time. Therefore, filter file compatibility was not maintained between versions until now. Filter created by version 0.4.0-alpha is not compatible with 0.5.0 (and version 0.5.0 has smaller filters than version 0.4.0). However, compatibility from v0.5.0 onwards (current version) will be maintained.
 
 ## Install
 haveibeenpwned can be downloaded from [Releases](https://github.com/CKingX/haveibeenpwned/releases) page for Ubuntu .deb package for 18.04 and later, generic linux executable for 64-bit Intel systems (You may need to run `chmod +x <path to binary>`), and Windows releases. If you have rustup installed (see Build Guide), you can install by running:
