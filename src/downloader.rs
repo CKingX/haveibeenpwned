@@ -149,6 +149,7 @@ pub fn downloader(output: OsString) {
                     });
                     config.store();
                     error::download_error(n);
+                    eprintln!("You can resume the download by running with the same command");
                     break;
                 }
             }

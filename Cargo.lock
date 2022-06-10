@@ -298,6 +298,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "directories"
+version = "4.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f51c5d4ddabd36886dd3e1438cb358cdcb0d7c499cb99cb4ac2e38e18b5cb210"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
 name = "dirs-sys"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -388,14 +397,14 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 
 [[package]]
 name = "haveibeenpwned"
-version = "0.5.0-alpha"
+version = "0.5.0"
 dependencies = [
  "bincode",
  "bitvec",
  "clap",
  "colored",
  "crossbeam-channel",
- "directories",
+ "directories 2.0.2",
  "env_logger",
  "indicatif",
  "log",
@@ -405,6 +414,7 @@ dependencies = [
  "serde",
  "sha1",
  "siphasher",
+ "update-informer",
  "ureq",
  "xorf",
 ]
@@ -798,6 +808,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "semver"
+version = "1.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a41d061efea015927ac527063765e73601444cdc344ba855bc7bd44578b25e1c"
+
+[[package]]
 name = "serde"
 version = "1.0.137"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -968,6 +984,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
+name = "update-informer"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f154aee470c0882ea0f3b1cc2a46c5f4d24f282655f7b0cec065614fe24c447f"
+dependencies = [
+ "directories 4.0.1",
+ "semver",
+ "serde",
+ "serde_json",
+ "ureq",
+]
+
+[[package]]
 name = "ureq"
 version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -980,6 +1009,8 @@ dependencies = [
  "log",
  "once_cell",
  "rustls",
+ "serde",
+ "serde_json",
  "url",
  "webpki",
  "webpki-roots",
