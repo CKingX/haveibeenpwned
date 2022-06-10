@@ -38,7 +38,7 @@ pub fn generate_filter(input: OsString, output: OsString) {
         SMALL_FILTER_SIZE
     );
     println!(
-        "The medium filter has false positivity rate of 0.016% (1 in 65,536) and needs {}",
+        "The medium filter has false positivity rate of 0.0016% (1 in 65,536) and needs {}",
         MEDIUM_FILTER_SIZE
     );
     println!(
