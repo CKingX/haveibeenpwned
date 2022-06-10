@@ -8,6 +8,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::ffi::OsString;
 use std::io::Write;
+use std::path::Path;
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -22,6 +23,15 @@ enum Message {
 }
 
 pub fn downloader(output: OsString) {
+    let output: &Path = output.as_ref();
+    let output = output.canonicalize();
+
+    if output.is_err() {
+        eprintln!("Unable to use output file");
+        return;
+    }
+    let output = output.unwrap().as_os_str().to_owned();
+
     let (sender, receiver) = bounded::<Message>(128);
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
@@ -46,10 +56,12 @@ pub fn downloader(output: OsString) {
     );
 
     let config = Config::load();
+    let mut resume_flag = false;
     let resume_file = if let Some(resume) = config.resume_token {
         if resume.download_file == output_file {
             Arc::new(RwLock::new(resume.resume))
         } else {
+            resume_flag = true;
             Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
         }
     } else {
@@ -62,7 +74,7 @@ pub fn downloader(output: OsString) {
         let file = std::fs::File::options()
             .write(true)
             .create(true)
-            .truncate(true)
+            .truncate(!resume_flag)
             .open(output_file);
 
         if let Ok(file) = file {
