@@ -25,7 +25,7 @@ impl Display for Size {
     }
 }
 
-const SIZE: f64 = 847_223_402.0;
+const SIZE: f64 = 847_223_405.0;
 const SMALL_FILTER_SIZE: Size = Size::MB(SIZE * 9.1 / 8.0 / 1024.0 / 1024.0);
 const MEDIUM_FILTER_SIZE: Size = Size::GB(SIZE * 18.1 / 8.0 / 1024.0 / 1024.0 / 1024.0);
 const LARGE_FILTER_SIZE: Size = Size::GB(SIZE * 36.2 / 8.0 / 1024.0 / 1024.0 / 1024.0);

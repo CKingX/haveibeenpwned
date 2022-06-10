@@ -24,10 +24,13 @@ pub enum Commands {
     },
     /// Check all passwords in a file to see if they are compromised
     FileCheck {
+        /// Path to the file containing passwords to check
         password_file: OsString,
-        file: OsString,
+        /// Path to the filter file
+        filter: OsString,
+        /// Use -p if you want to print compromised passwords
         #[clap(short, long)]
-        print_passwords: bool,
+        print_compromised_passwords: bool,
     },
     /// Create an efficient filter that allows you to check passwords offline
     /// However, while significantly smaller, it can result in false positives

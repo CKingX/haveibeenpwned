@@ -7,6 +7,7 @@ mod filter_generator;
 mod interactive_file;
 mod interactive_online;
 mod password;
+mod file_check;
 
 use arguments::*;
 
@@ -19,9 +20,9 @@ fn main() {
         Commands::Downloader { output } => downloader::downloader(output),
         Commands::FileCheck {
             password_file,
-            file,
-            print_passwords,
-        } => todo!(),
+            filter,
+            print_compromised_passwords,
+        } => file_check::file_check(password_file, filter, print_compromised_passwords),
         Commands::CreateFilter { input, output } => {
             filter_generator::generate_filter(input, output)
         }
