@@ -19,12 +19,12 @@ Prebuilt filters are available ([small](https://mega.nz/file/l5JwgTgR#fUtrkSzuIt
 As haveibeenpwned was in alpha, the design of the filter was not final at the time. Therefore, filter file compatibility was not maintained between versions until now. Filter created by version 0.4.0-alpha is not compatible with 0.5.0 (and version 0.5.0 has smaller filters than version 0.4.0). However, compatibility from v0.5.0 onwards (current version) will be maintained.
 
 ## Install
-haveibeenpwned can be downloaded from [Releases](https://github.com/CKingX/haveibeenpwned/releases) page for Ubuntu .deb package for 18.04 and later, generic linux executable for 64-bit Intel systems (You may need to run `chmod +x <path to binary>`), and Windows releases. If you have rustup installed (see Build Guide), you can install by running:
+haveibeenpwned can be downloaded from [Releases](https://github.com/CKingX/haveibeenpwned/releases) page for Ubuntu .deb package for 18.04 and later, generic linux executable for 64-bit Intel systems (You may need to run `chmod +x <path to binary>`), and Windows releases. For Windows, haveibeenpwned can also be installed with `winget install haveibeenpwned`. If you have rustup installed (see Build Guide), you can install by running:
 ```
 cargo intall haveibeenpwned
 ```
 
-Currently, macOS builds are not provided as I do not have a Mac. I will also work on creating a flatpak version of haveibeenpwned
+Currently, macOS builds are not provided as I do not have a Mac. However, using the build guide and installing with `cargo install haveibeenpwned` should work. I will also work on creating a flatpak version of haveibeenpwned
 
 ## Upgrade Instructions
 If you use the deb file on Ubuntu, uninstall the deb package with:
@@ -33,7 +33,7 @@ sudo apt remove haveibeenpwned
 ```
 Finally, install with the newer deb file.
 
-For Windows, just replace the older haveibeenpwned.exe with the newer version.
+For Windows, just replace the older haveibeenpwned.exe with the newer version. If you used winget to install, you can update using `winget upgrade haveibeenpwned`. If you have used cargo install to install haveibeenpwned, running `cargo install haveibeenpwned` will update it. 
 
 If you used the haveibeenpwned linux binary, just replace it with newer one (you may need to run `chmodm +x <path to haveibeenpwned>` again)
 
