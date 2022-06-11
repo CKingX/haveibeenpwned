@@ -35,7 +35,7 @@ Finally, install with the newer deb file.
 
 For Windows, just replace the older haveibeenpwned.exe with the newer version. If you used winget to install, you can update using `winget upgrade haveibeenpwned`. If you have used cargo install to install haveibeenpwned, running `cargo install haveibeenpwned` will update it. 
 
-If you used the haveibeenpwned linux binary, just replace it with newer one (you may need to run `chmodm +x <path to haveibeenpwned>` again)
+If you used the haveibeenpwned linux binary, just replace it with newer one (you may need to run `chmod +x <path to haveibeenpwned>` again)
 
 ## Build Guide
 We can use cargo to build haveibeenpwned. We first need to install rustup and build tools (instructions for those can be found [here](https://www.rust-lang.org/tools/install)). Then, we can build with:
