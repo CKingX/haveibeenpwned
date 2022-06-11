@@ -19,7 +19,10 @@ fn main() {
     let version = env!("CARGO_PKG_VERSION");
     let informer = update_informer::new(registry::Crates, name, version);
     if let Ok(Some(version)) = informer.check_version() {
-        println!("New version is available: {} at https://github.com/CKingX/haveibeenpwned", version);
+        println!(
+            "New version is available: {} at https://github.com/CKingX/haveibeenpwned",
+            version
+        );
     }
 
     match args.command {

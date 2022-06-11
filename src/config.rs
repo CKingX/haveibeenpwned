@@ -30,7 +30,8 @@ impl Config {
             .expect("Unable to open config file");
 
         let mut file_contents = Vec::new();
-        file.read_to_end(&mut file_contents).expect("Unable to read config file");
+        file.read_to_end(&mut file_contents)
+            .expect("Unable to read config file");
         let result: Result<Self, _> = bincode::deserialize(&file_contents);
         match result {
             Ok(result) => result,
@@ -49,7 +50,8 @@ impl Config {
             .open(config_file)
             .expect("Unable to open config file");
         let serialized = bincode::serialize(&self).expect("Unable to create configuration");
-        file.write_all(&serialized).expect("Unable to write configuration file");
+        file.write_all(&serialized)
+            .expect("Unable to write configuration file");
     }
 
     fn get_config_file() -> PathBuf {
