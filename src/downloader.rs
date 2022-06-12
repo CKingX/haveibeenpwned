@@ -23,15 +23,6 @@ enum Message {
 }
 
 pub fn downloader(output: OsString) {
-    let output: &Path = output.as_ref();
-    let output = output.canonicalize();
-
-    if output.is_err() {
-        eprintln!("Unable to use output file");
-        return;
-    }
-    let output = output.unwrap().as_os_str().to_owned();
-
     let (sender, receiver) = bounded::<Message>(128);
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
@@ -69,7 +60,7 @@ pub fn downloader(output: OsString) {
     };
 
     let resume = Arc::clone(&resume_file);
-
+    
     let thread = thread::spawn(move || {
         let file = std::fs::File::options()
             .write(true)
@@ -143,6 +134,8 @@ pub fn downloader(output: OsString) {
                 Message::Error(n) => {
                     progress_bar.abandon_with_message("⚠️");
                     let mut config = Config::load();
+                    let output: &Path = output.as_ref();
+                    let output = output.canonicalize().unwrap().as_os_str().to_owned();
                     config.resume_token = Some(Resume {
                         resume: resume_file.read().unwrap().clone(),
                         download_file: output,

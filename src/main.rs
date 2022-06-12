@@ -37,5 +37,6 @@ fn main() {
         Commands::CreateFilter { input, output } => {
             filter_generator::generate_filter(input, output)
         }
+        Commands::ResumeDownload => todo!(),
     };
 }

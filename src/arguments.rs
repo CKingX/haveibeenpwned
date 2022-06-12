@@ -1,4 +1,4 @@
-use clap::{IntoApp, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use std::ffi::OsString;
 
 #[derive(Parser)]
@@ -40,13 +40,15 @@ pub enum Commands {
         /// Output location of the filter
         output: OsString,
     },
+    /// Resume existing download
+    #[clap(hide = hide_resume())]
+    ResumeDownload,
 }
 
 pub fn handle_arguments() -> Cli {
     Cli::parse()
 }
 
-#[allow(deprecated)]
-pub fn _handle_command() -> clap::App<'static> {
-    Cli::command()
+fn hide_resume() -> bool {
+    false
 }
