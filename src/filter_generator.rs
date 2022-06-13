@@ -7,7 +7,6 @@ use std::{
 };
 
 pub fn generate_filter(input: OsString, output: OsString) {
-
     let input_file = std::fs::File::options().read(true).open(input);
     let output_file = std::fs::File::options()
         .write(true)

@@ -4,11 +4,11 @@ use std::{
 };
 
 use crate::password::{self, Password};
+use roaring::bitmap::RoaringBitmap;
 use serde::{Deserialize, Serialize};
 use siphasher::sip::SipHasher13;
 use std::ffi::OsString;
 use xorf::{BinaryFuse16, BinaryFuse32, BinaryFuse8, Filter as FuseFilter};
-use roaring::bitmap::RoaringBitmap;
 
 const RB_SIZE: f64 = 4.0 * 8.0 * 1024.0 * 1024.0 * 1024.0;
 
@@ -19,11 +19,11 @@ pub enum FilterSize {
     Large,
 }
 
-pub struct RB(u64,RoaringBitmap);
+pub struct RB(u64, RoaringBitmap);
 
 impl RB {
     pub fn new(size: u64) -> Self {
-        let k = f64::round(RB_SIZE/size as f64 * f64::ln(2.0));
+        let k = f64::round(RB_SIZE / size as f64 * f64::ln(2.0));
         Self(k as u64, RoaringBitmap::new())
     }
 
@@ -38,7 +38,7 @@ impl RB {
     }
 
     pub fn check(&self, password: &str) -> bool {
-        let mut result = false;
+        let mut result = true;
         let first_hash = password::hash(password);
         for i in 0..self.0 {
             let mut second_hash = SipHasher13::new_with_keys(i, i);
@@ -49,7 +49,8 @@ impl RB {
         result
     }
 
-    pub fn serialize(&self, writer: impl Write) -> std::io::Result<()> {
+    pub fn serialize(&self, mut writer: impl Write) -> std::io::Result<()> {
+        writer.write_all(&mut self.0.to_le_bytes()).unwrap();
         self.1.serialize_into(writer)
     }
 
@@ -66,7 +67,7 @@ impl RB {
 
         let mut input_file = BufReader::new(input_file.unwrap());
 
-        let mut wow = [0;8];
+        let mut wow = [0; 8];
         std::io::Read::read_exact(&mut input_file, &mut wow);
 
         let hash_count: u64 = u64::from_le_bytes(wow);
