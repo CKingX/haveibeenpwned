@@ -1,9 +1,9 @@
-use crate::filter::Filter;
+use crate::filter::{Filter, RB};
 use crate::password;
 use std::ffi::OsString;
 
 pub fn interactive_file(file: OsString) {
-    let filter = if let Some(filter) = Filter::open_filter(file) {
+    let filter = if let Ok(filter) = RB::open(file) {
         filter
     } else {
         return;
@@ -13,11 +13,12 @@ pub fn interactive_file(file: OsString) {
     loop {
         let password = password::get_password();
 
-        let result = filter.check_password(&password);
+        let result = filter.check(&password);
 
-        match result {
-            password::Password::SafePassword => println!("Password not compromised"),
-            password::Password::CompromisedPassword => println!("Password is compromised"),
+        if result {
+            println!("Password is compromised");
+        } else {
+            println!("Password not compromised");
         }
     }
 }

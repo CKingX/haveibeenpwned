@@ -1,6 +1,6 @@
 use std::{
     hash::{Hash, Hasher},
-    io::BufReader,
+    io::{BufReader, Write},
 };
 
 use crate::password::{self, Password};
@@ -8,12 +8,80 @@ use serde::{Deserialize, Serialize};
 use siphasher::sip::SipHasher13;
 use std::ffi::OsString;
 use xorf::{BinaryFuse16, BinaryFuse32, BinaryFuse8, Filter as FuseFilter};
+use roaring::bitmap::RoaringBitmap;
+
+const RB_SIZE: f64 = 4.0 * 8.0 * 1024.0 * 1024.0 * 1024.0;
 
 #[derive(Copy, Clone)]
 pub enum FilterSize {
     Small,
     Medium,
     Large,
+}
+
+pub struct RB(u64,RoaringBitmap);
+
+impl RB {
+    pub fn new(size: u64) -> Self {
+        let k = f64::round(RB_SIZE/size as f64 * f64::ln(2.0));
+        Self(k as u64, RoaringBitmap::new())
+    }
+
+    pub fn insert(&mut self, password: &str) {
+        let first_hash = password::hash(password);
+        for i in 0..self.0 {
+            let mut second_hash = SipHasher13::new_with_keys(i, i);
+            first_hash.hash(&mut second_hash);
+            let final_hash = second_hash.finish() as u32;
+            self.1.insert(final_hash);
+        }
+    }
+
+    pub fn check(&self, password: &str) -> bool {
+        let mut result = false;
+        let first_hash = password::hash(password);
+        for i in 0..self.0 {
+            let mut second_hash = SipHasher13::new_with_keys(i, i);
+            first_hash.hash(&mut second_hash);
+            let final_hash = second_hash.finish() as u32;
+            result &= self.1.contains(final_hash);
+        }
+        result
+    }
+
+    pub fn serialize(&self, writer: impl Write) -> std::io::Result<()> {
+        self.1.serialize_into(writer)
+    }
+
+    pub fn len(&self) -> u64 {
+        self.1.len()
+    }
+
+    pub fn open(file: OsString) -> Result<Self, ()> {
+        let input_file = std::fs::File::options().read(true).open(file);
+        if let Err(error) = input_file {
+            eprintln!("Unable to open the input file: {}", error.kind());
+            return Err(());
+        }
+
+        let mut input_file = BufReader::new(input_file.unwrap());
+
+        let mut wow = [0;8];
+        std::io::Read::read_exact(&mut input_file, &mut wow);
+
+        let hash_count: u64 = u64::from_le_bytes(wow);
+
+        let filter = RoaringBitmap::deserialize_from(input_file);
+
+        if filter.is_err() {
+            eprintln!("Input file is not a valid filter");
+            return Err(());
+        }
+
+        let filter = filter.unwrap();
+
+        Ok(Self(hash_count, filter))
+    }
 }
 
 #[derive(Serialize, Deserialize)]
