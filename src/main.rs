@@ -10,6 +10,7 @@ mod interactive_online;
 mod password;
 
 use arguments::*;
+use config::Config;
 use update_informer::{registry, Check};
 
 fn main() {
@@ -26,17 +27,20 @@ fn main() {
     }
 
     match args.command {
-        Commands::InteractiveFile { file } => interactive_file::interactive_file(file),
+        Commands::InteractiveFile { file } => interactive_file::interactive_file(arguments::filter_file(file)),
         Commands::InteractiveOnline => interactive_online::interactive(),
-        Commands::Downloader { output } => downloader::downloader(output),
+        Commands::Downloader { output, force } => downloader::downloader(output, force, false),
         Commands::FileCheck {
             password_file,
             filter,
             print_compromised_passwords,
-        } => file_check::file_check(password_file, filter, print_compromised_passwords),
+        } => file_check::file_check(password_file, arguments::filter_file(filter), print_compromised_passwords),
         Commands::CreateFilter { input, output } => {
             filter_generator::generate_filter(input, output)
         }
-        Commands::ResumeDownload => todo!(),
+        Commands::ResumeDownload => {
+            let config = Config::load();
+            downloader::downloader(config.resume_token.unwrap().download_file, false, true)
+        },
     };
 }

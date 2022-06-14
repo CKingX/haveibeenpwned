@@ -35,3 +35,7 @@ update-informer = "0.5.0"
 overflow-checks = true
 lto = "thin"
 strip = true
+
+[features]
+winfilter = []
+linuxfilter = []

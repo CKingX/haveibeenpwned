@@ -22,7 +22,7 @@ enum Message {
     Error(u64),
 }
 
-pub fn downloader(output: OsString) {
+pub fn downloader(output: OsString, force: bool, resume_status: bool) {
     let (sender, receiver) = bounded::<Message>(128);
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
@@ -47,14 +47,9 @@ pub fn downloader(output: OsString) {
     );
 
     let config = Config::load();
-    let mut resume_flag = false;
-    let resume_file = if let Some(resume) = config.resume_token {
-        if resume.download_file == output_file {
-            Arc::new(RwLock::new(resume.resume))
-        } else {
-            resume_flag = true;
-            Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
-        }
+    let resume_file = if resume_status {
+        let resume = config.resume_token.unwrap();
+        Arc::new(RwLock::new(resume.resume))
     } else {
         Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
     };
@@ -65,7 +60,8 @@ pub fn downloader(output: OsString) {
         let file = std::fs::File::options()
             .write(true)
             .create(true)
-            .truncate(!resume_flag)
+            .create_new(!force && !resume_status)
+            .truncate(!resume_status)
             .open(output_file);
 
         if let Ok(file) = file {
@@ -142,7 +138,7 @@ pub fn downloader(output: OsString) {
                     });
                     config.store();
                     error::download_error(n);
-                    eprintln!("You can resume the download by running with the same command");
+                    eprintln!("You can resume the download by running haveibeenpwned download-resume");
                     break;
                 }
             }
