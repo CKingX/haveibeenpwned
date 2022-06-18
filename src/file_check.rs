@@ -4,10 +4,11 @@ use std::{ffi::OsString, io::BufRead};
 
 use rayon::iter::ParallelBridge;
 
+use crate::arguments::Print;
 use crate::filter::Filter;
 use crate::password::Password;
 
-pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bool) {
+pub fn file_check(password_file: OsString, filter: OsString, print_passwords: Option<Print>) {
     println!("Loading filter...");
     let filter = if let Some(filter) = Filter::open_filter(filter) {
         filter
@@ -45,9 +46,11 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: bo
             let password = password.unwrap();
             if let Password::CompromisedPassword = filter.check_password(&password) {
                 compromised_count.fetch_add(1, Ordering::Relaxed);
-                if print_passwords {
+                if let Some(Print::Compromised) = print_passwords {
                     println!("{password}");
                 }
+            } else if let Some(Print::Safe) = print_passwords {
+                    println!("{password}");
             }
 
             Ok(())

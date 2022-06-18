@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, clap_derive::ArgEnum};
 use std::{ffi::OsString, path::Path};
 
 use crate::config::Config;
@@ -16,6 +16,15 @@ pub static FILTER: Option<&str> = if cfg!(feature = "winfilter") {
 pub struct Cli {
     #[clap(subcommand)]
     pub command: Commands,
+}
+
+#[derive(ArgEnum, Parser, Clone)]
+#[clap(arg_enum)]
+pub enum Print {
+    /// Print passwords that are not compromised
+    Safe,
+    /// Print passwords that are compromised
+    Compromised,
 }
 
 #[derive(Subcommand)]
@@ -43,9 +52,9 @@ pub enum Commands {
         /// Path to the filter file
         #[clap (required = is_filter_required())]
         filter: Option<OsString>,
-        /// Use -p if you want to print compromised passwords
-        #[clap(short, long)]
-        print_compromised_passwords: bool,
+        /// Use -p if you want to print passwords
+        #[clap(short, long, value_parser)]
+        print_compromised_passwords: Option<Print>,
     },
     /// Create an efficient filter that allows you to check passwords offline
     /// However, while significantly smaller, it can result in false positives
