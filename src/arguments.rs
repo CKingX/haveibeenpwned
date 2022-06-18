@@ -72,10 +72,7 @@ fn hide_resume() -> bool {
 
     let resume_file = config.resume_token.unwrap().download_file;
     let resume_file: &Path = resume_file.as_ref();
-    match resume_file.canonicalize() {
-        Ok(_) => false,
-        Err(_) => true,
-    }
+    resume_file.canonicalize().is_err()
 }
 
 fn is_filter_required() -> bool {
@@ -90,23 +87,16 @@ fn is_filter_required() -> bool {
     let filter: &Path = filter.as_ref();
     let filter_exists = filter.canonicalize();
 
-    if filter_exists.is_ok() {
-        false
-    } else {
-        true
-    }
+    filter_exists.is_err()
 }
 
 pub fn filter_file(file: Option<OsString>) -> OsString {
     if let Some(file) = file {
         file
+    } else if let Some(filter) = FILTER {
+        OsString::from(filter)
     } else {
-        if let Some(filter) = FILTER {
-            OsString::from(filter)
-        } else {
-            let config = Config::load();
-            let filter = config.password_filter.unwrap();
-            filter
-        }
+        let config = Config::load();
+        config.password_filter.unwrap()
     }
 }

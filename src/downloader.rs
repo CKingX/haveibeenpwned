@@ -55,7 +55,7 @@ pub fn downloader(output: OsString, force: bool, resume_status: bool) {
     };
 
     let resume = Arc::clone(&resume_file);
-    
+
     let thread = thread::spawn(move || {
         let file = std::fs::File::options()
             .write(true)
