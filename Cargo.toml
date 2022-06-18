@@ -39,3 +39,12 @@ strip = true
 [features]
 winfilter = []
 linuxfilter = []
+
+[package.metadata.deb]
+features = ["linuxfilter"]
+extended-description = "haveibeenpwned is a command-line application that uses HaveIBeenPwned service and can create and use Binary Fuse filters (smaller and faster than Bloom and Cuckoo filters at the same false positivity rate) for efficient query at cost of false positives."
+assets = [
+    ["../small.bin", "/usr/share/haveibeenpwned/filter.bin", "644"],
+    ["target/release/haveibeenpwned", "/usr/bin/", "755"],
+    ["README.md", "/usr/share/doc/haveibeenpwned/README.md", "644"],
+]

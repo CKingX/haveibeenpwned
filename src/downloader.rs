@@ -138,7 +138,7 @@ pub fn downloader(output: OsString, force: bool, resume_status: bool) {
                     });
                     config.store();
                     error::download_error(n);
-                    eprintln!("You can resume the download by running haveibeenpwned download-resume");
+                    // eprintln!("You can resume the download by running haveibeenpwned download-resume");
                     break;
                 }
             }
