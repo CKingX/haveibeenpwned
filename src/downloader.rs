@@ -12,6 +12,7 @@ use std::path::Path;
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 
 const HIBP_TOTAL: u64 = 16u64.pow(5) - 1;
 
@@ -22,16 +23,7 @@ enum Message {
     Error(u64),
 }
 
-pub fn downloader(output: OsString) {
-    let output: &Path = output.as_ref();
-    let output = output.canonicalize();
-
-    if output.is_err() {
-        eprintln!("Unable to use output file");
-        return;
-    }
-    let output = output.unwrap().as_os_str().to_owned();
-
+pub fn downloader(output: OsString, force: bool, resume_status: bool) {
     let (sender, receiver) = bounded::<Message>(128);
     let sender = Arc::new(sender);
     let progress_bar = ProgressBar::new(HIBP_TOTAL);
@@ -56,14 +48,9 @@ pub fn downloader(output: OsString) {
     );
 
     let config = Config::load();
-    let mut resume_flag = false;
-    let resume_file = if let Some(resume) = config.resume_token {
-        if resume.download_file == output_file {
-            Arc::new(RwLock::new(resume.resume))
-        } else {
-            resume_flag = true;
-            Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
-        }
+    let resume_file = if resume_status {
+        let resume = config.resume_token.unwrap();
+        Arc::new(RwLock::new(resume.resume))
     } else {
         Arc::new(RwLock::new(bitbox![0;HIBP_TOTAL as usize + 1]))
     };
@@ -72,14 +59,18 @@ pub fn downloader(output: OsString) {
 
     let thread = thread::spawn(move || {
         let file = std::fs::File::options()
-            .write(true)
+            .write(!resume_status)
+            .append(resume_status)
             .create(true)
-            .truncate(!resume_flag)
+            .create_new(!force && !resume_status)
+            .truncate(!resume_status)
             .open(output_file);
 
         if let Ok(file) = file {
             let file = Mutex::new(std::io::BufWriter::new(file));
-            let agent = ureq::agent();
+            let agent = ureq::AgentBuilder::new()
+                .timeout(Duration::from_secs(30))
+                .build();
             let resume = Arc::clone(&resume);
 
             _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
@@ -143,16 +134,19 @@ pub fn downloader(output: OsString) {
                 Message::Error(n) => {
                     progress_bar.abandon_with_message("⚠️");
                     let mut config = Config::load();
+                    let output: &Path = output.as_ref();
+                    let output = output.canonicalize().unwrap().as_os_str().to_owned();
                     config.resume_token = Some(Resume {
                         resume: resume_file.read().unwrap().clone(),
                         download_file: output,
                     });
                     config.store();
                     error::download_error(n);
-                    eprintln!("You can resume the download by running with the same command");
+                    eprintln!("You can resume the download by running haveibeenpwned resume-download");
                     break;
                 }
-            }
+            },
+            default => progress_bar.set_position(progress),
         }
     }
 

@@ -18,14 +18,14 @@ enum Size {
 impl Display for Size {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let output = match &self {
-            Size::GB(num) => format!("{:.1} GiB", num),
-            Size::MB(num) => format!("{:.1} MiB", num),
+            Size::GB(num) => format!("{:.2} GiB", num),
+            Size::MB(num) => format!("{:.2} MiB", num),
         };
         write!(f, "{output}")
     }
 }
 
-const SIZE: f64 = 847_223_405.0;
+const SIZE: f64 = 847_223_406.0;
 const SMALL_FILTER_SIZE: Size = Size::MB(SIZE * 9.1 / 8.0 / 1024.0 / 1024.0);
 const MEDIUM_FILTER_SIZE: Size = Size::GB(SIZE * 18.1 / 8.0 / 1024.0 / 1024.0 / 1024.0);
 const LARGE_FILTER_SIZE: Size = Size::GB(SIZE * 36.2 / 8.0 / 1024.0 / 1024.0 / 1024.0);

@@ -1,6 +1,6 @@
 [package]
 name = "haveibeenpwned"
-version = "0.5.1"
+version = "1.0.0"
 edition = "2021"
 license = "AGPL-3.0-only"
 authors = ["CKingX"]
@@ -15,8 +15,6 @@ categories = ["command-line-utilities"]
 
 [dependencies]
 clap = {version = "3.1.10", features = ["derive"] }
-log = "0.4.*"
-env_logger = "0.9.*"
 ureq = {version = "2.4.0", features = ["brotli"]}
 rpassword = "6.0.1"
 sha1 = "0.10.1"
@@ -37,3 +35,16 @@ update-informer = "0.5.0"
 overflow-checks = true
 lto = "thin"
 strip = true
+
+[features]
+winfilter = []
+linuxfilter = []
+
+[package.metadata.deb]
+features = ["linuxfilter"]
+extended-description = "haveibeenpwned is a command-line application that uses HaveIBeenPwned service and can create and use Binary Fuse filters (smaller and faster than Bloom and Cuckoo filters at the same false positivity rate) for efficient query at cost of false positives."
+assets = [
+    ["../small.bin", "/usr/share/haveibeenpwned/filter.bin", "644"],
+    ["target/release/haveibeenpwned", "/usr/bin/", "755"],
+    ["README.md", "/usr/share/doc/haveibeenpwned/README.md", "644"],
+]

@@ -3,10 +3,14 @@ use std::{
     io::BufReader,
 };
 
-use crate::password::{self, Password};
+use crate::{
+    config::Config,
+    password::{self, Password},
+};
 use serde::{Deserialize, Serialize};
 use siphasher::sip::SipHasher13;
 use std::ffi::OsString;
+use std::path::Path;
 use xorf::{BinaryFuse16, BinaryFuse32, BinaryFuse8, Filter as FuseFilter};
 
 #[derive(Copy, Clone)]
@@ -79,7 +83,7 @@ impl Filter {
     }
 
     pub fn open_filter(file: OsString) -> Option<Self> {
-        let input_file = std::fs::File::options().read(true).open(file);
+        let input_file = std::fs::File::options().read(true).open(&file);
         if let Err(error) = input_file {
             eprintln!("Unable to open the input file: {}", error.kind());
             return None;
@@ -93,6 +97,12 @@ impl Filter {
             eprintln!("Input file is not a valid filter");
             return None;
         }
+
+        let mut config = Config::load();
+        let expanded_file: &Path = file.as_ref();
+        let file = expanded_file.canonicalize().unwrap().as_os_str().to_owned();
+        config.password_filter = Some(file);
+        config.store();
 
         Some(filter.unwrap())
     }
