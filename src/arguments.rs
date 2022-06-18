@@ -4,7 +4,7 @@ use std::{ffi::OsString, path::Path};
 use crate::config::Config;
 
 pub static FILTER: Option<&str> = if cfg!(feature = "winfilter") {
-    Some("C:\\Program Files\\haveibeenwpned\\filter.bin")
+    Some("C:\\Program Files\\haveibeenpwned\\filter.bin")
 } else if cfg!(feature = "linuxfilter") {
     Some("/usr/share/haveibeenpwned/filter.bin")
 } else {
