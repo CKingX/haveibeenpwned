@@ -50,7 +50,7 @@ pub fn file_check(password_file: OsString, filter: OsString, print_passwords: Op
                     println!("{password}");
                 }
             } else if let Some(Print::Safe) = print_passwords {
-                    println!("{password}");
+                println!("{password}");
             }
 
             Ok(())

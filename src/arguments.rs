@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, clap_derive::ArgEnum};
+use clap::{clap_derive::ArgEnum, Parser, Subcommand};
 use std::{ffi::OsString, path::Path};
 
 use crate::config::Config;

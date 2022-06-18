@@ -46,6 +46,10 @@ fn main() {
         }
         Commands::ResumeDownload => {
             let config = Config::load();
+            if config.resume_token.is_none() {
+                eprintln!("There is no download file that can be resumed");
+                return;
+            }
             downloader::downloader(config.resume_token.unwrap().download_file, false, true)
         }
     };
