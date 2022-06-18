@@ -12,6 +12,7 @@ use std::path::Path;
 use std::sync::RwLock;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 
 const HIBP_TOTAL: u64 = 16u64.pow(5) - 1;
 
@@ -58,7 +59,8 @@ pub fn downloader(output: OsString, force: bool, resume_status: bool) {
 
     let thread = thread::spawn(move || {
         let file = std::fs::File::options()
-            .write(true)
+            .write(!resume_status)
+            .append(resume_status)
             .create(true)
             .create_new(!force && !resume_status)
             .truncate(!resume_status)
@@ -66,7 +68,9 @@ pub fn downloader(output: OsString, force: bool, resume_status: bool) {
 
         if let Ok(file) = file {
             let file = Mutex::new(std::io::BufWriter::new(file));
-            let agent = ureq::agent();
+            let agent = ureq::AgentBuilder::new()
+                .timeout(Duration::from_secs(30))
+                .build();
             let resume = Arc::clone(&resume);
 
             _ = (0..=HIBP_TOTAL).into_par_iter().try_for_each(|n| {
@@ -138,10 +142,11 @@ pub fn downloader(output: OsString, force: bool, resume_status: bool) {
                     });
                     config.store();
                     error::download_error(n);
-                    // eprintln!("You can resume the download by running haveibeenpwned download-resume");
+                    eprintln!("You can resume the download by running haveibeenpwned resume-download");
                     break;
                 }
-            }
+            },
+            default => progress_bar.set_position(progress),
         }
     }
 

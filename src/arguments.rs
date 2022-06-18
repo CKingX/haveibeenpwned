@@ -65,15 +65,14 @@ pub fn handle_arguments() -> Cli {
 }
 
 fn hide_resume() -> bool {
-    true
-    // let config = Config::load();
-    // if config.resume_token.is_none() {
-    //     return true;
-    // }
+    let config = Config::load();
+    if config.resume_token.is_none() {
+        return true;
+    }
 
-    // let resume_file = config.resume_token.unwrap().download_file;
-    // let resume_file: &Path = resume_file.as_ref();
-    // resume_file.canonicalize().is_err()
+    let resume_file = config.resume_token.unwrap().download_file;
+    let resume_file: &Path = resume_file.as_ref();
+    resume_file.canonicalize().is_err()
 }
 
 fn is_filter_required() -> bool {
